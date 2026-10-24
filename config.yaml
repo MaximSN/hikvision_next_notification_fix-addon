@@ -1,0 +1,26 @@
+name: "Camera Host Proxy"
+description: "Промежуточный прокси для камеры: добавление заголовка Host и перенаправление"
+version: "1.0.3"
+slug: "camera_host_proxy"
+arch:
+  - aarch64
+  - amd64
+  - armv7
+  - armhf
+init: false
+startup: services
+boot: auto
+options:
+  listen_port: 8234
+  target_host: "192.168.0.32"
+  target_port: 8123
+  host_header_value: "192.168.0.32"
+ports:
+  8234/tcp: 8234
+ports_description:
+  8234/tcp: "Camera proxy listen port"
+schema:
+  listen_port: "port"
+  target_host: "str"
+  target_port: "port"
+  host_header_value: "str"

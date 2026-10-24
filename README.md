@@ -6,6 +6,7 @@
 При отправке уведомлений о событиях (например, пересечении линии) прошивка камеры Hikvision формирует некорректный сетевой пакет: она отправляет запрос по протоколу HTTP/1.1, но полностью игнорирует обязательный заголовок Host.
 
 Пример из tcpdump:
+```text
 POST /api/hikvision_local HTTP/1.1
 Content-Type: application/xml; charset="UTF-8"
 Content-Length: 825
@@ -23,11 +24,13 @@ Content-Length: 825
   <eventDescription>linedetection alarm</eventDescription>
   ...
 </EventNotificationAlert>
+```
 
 Почему это приводит к ошибке:
 
 Нарушение стандартов RFC: Согласно спецификации HTTP/1.1, заголовок Host является строго обязательным. Без него запрос считается повреждённым.
 Отказ со стороны Home Assistant: Встроенный веб-сервер Home Assistant (aiohttp) при прямой отправке запроса от камеры на порт 8123 видит это нарушение протокола, расценивает пакет как некорректный и сразу сбрасывает соединение, выдавая ошибку:
+```text
 2026-10-24 15:14:25.893 ERROR (MainThread) [aiohttp.server] Error handling request from <IP_камеры>
 Traceback (most recent call last):
   File "/usr/local/lib/python3.14/site-packages/aiohttp/web_protocol.py", line 446, in data_received
@@ -41,7 +44,7 @@ Traceback (most recent call last):
     raise BadHttpMessage("Missing 'Host' header in request.")
 aiohttp.http_exceptions.BadHttpMessage: 400, message:
   Missing 'Host' header in request.
-
+```
   2. Описание аддона
 Camera Host Proxy — локальный аддон Home Assistant, который:
 Слушает заданный порт (по умолчанию 8234) и принимает HTTP-запросы от камеры.
